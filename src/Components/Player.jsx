@@ -1,10 +1,9 @@
 import { useState } from "react"
 
-export default function Player ({name, color}){ 
+export default function Player ({name, color, isActive}){ 
    const [isEditing, setIsEditing] = useState(false); 
    const [playerName, setPlayerName] = useState(name); 
 
-    let editablePlayerName = (<span className="player-name">{playerName}</span>)
    
     function editClickHandler(){
         setIsEditing((editing)=>!editing) 
@@ -13,13 +12,14 @@ export default function Player ({name, color}){
     function nameInputChangeHandler(event){
          setPlayerName(event.target.value)
     }
-     
+    let editablePlayerName = (<span className="player-name">{playerName}</span>)
+
     if(isEditing){
-        editablePlayerName = (<input type="text" onChange={nameInputChangeHandler}/>)
+        editablePlayerName = (<input type="text" required  value={playerName} onChange={nameInputChangeHandler}/>)
     }
 
     return(
-        <li>
+        <li className={isActive ? 'active':undefined}>
             <span className="player">
             {editablePlayerName}
             <span className='player-symbol'>{color}</span>
@@ -29,12 +29,4 @@ export default function Player ({name, color}){
     )
 }
 
-const white={
-     width:'100%',
-     height:'100%', 
-     background:'white'
-}
-
-const black={
-    background:'black', 
-}
+ 
