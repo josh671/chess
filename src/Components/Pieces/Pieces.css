@@ -1,0 +1,30 @@
+.pieces{
+    position: absolute; 
+    left: calc(.25 * var(--tile-size)); 
+    right: 0; 
+    top: 0; 
+    bottom: calc(.25 * var(--tile-size));
+} 
+
+.piece{
+    width: 12.5%; 
+    height: 12.5%; 
+    position: absolute; 
+    background-size: 100%; 
+}
+
+.piece.bk { background-image: url('../Assets/ChessSprites/bk.png');}
+.piece.bq { background-image: url('../Assets/ChessSprites/bq.png');}
+.piece.br { background-image: url('../Assets/ChessSprites/br.png');}
+.piece.bb { background-image: url('../Assets/ChessSprites/bb.png');}
+.piece.bn { background-image: url('../Assets/ChessSprites/bn.png');}
+.piece.bp { background-image: url('../Assets/ChessSprites/bp.png');}
+
+.piece.wk { background-image: url('../Assets/ChessSprites/wk.png');}
+.piece.wq { background-image: url('../Assets/ChessSprites/wq.png');}
+.piece.wr { background-image: url('../Assets/ChessSprites/wr.png');}
+.piece.wb { background-image: url('../Assets/ChessSprites/wb.png');}
+.piece.wn { background-image: url('../Assets/ChessSprites/wn.png');}
+.piece.wp { background-image: url('../Assets/ChessSprites/wp.png');}
+
+ 
