@@ -1,4 +1,4 @@
-import Board from "./Board/Board" 
+import Board from "./Components/Board/Board" 
 
 function App() {
   
