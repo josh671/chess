@@ -1,5 +1,3 @@
- 
-
 const Piece = ({rank, file, piece}) =>{
    
     const onDragStart = e =>{
