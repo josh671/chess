@@ -19,3 +19,15 @@
 .tile--dark {
     background-color: var(--dark-tile);
 }
+
+  .highlight:after {
+    display: block;
+    position: absolute;
+    content: '';
+    width : calc(.5*var(--tile-size));
+    height : calc(.5*var(--tile-size));
+    background: var(--highlight);
+    border-radius: 50%;
+    left: 25%;
+    top: 25%;
+}
