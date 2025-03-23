@@ -2,6 +2,7 @@ import './Board.css'
  import Ranks from './bits/Ranks.jsx'; 
 import Files from './bits/Files.jsx'; 
 import Pieces from '../Pieces/Pieces.jsx';
+import { useAppContext } from '../Context/Context.jsx';
 const Board = () => {
 
 
@@ -12,9 +13,20 @@ const Board = () => {
     .fill()
     .map((x, i) => i + 1);
 
+  const {appState} = useAppContext(); 
+  const position = appState.position[appState.position.length - 1]; 
+
     const getClassName = (i, j) =>{
-        let c = ''; 
-        c += (i + j) % 2 === 0 ? 'tile--dark' : 'tile--light'; 
+        let c = 'tile'; 
+        c += (i + j) % 2 === 0 ? ' tile--dark' : ' tile--light'; 
+
+        if(appState.candidateMoves?.find(m =>m[0] === i && m[1] === j)){
+          if(position[i][j]) 
+            c+=' attacking'
+          else
+            c+= ' highlight'
+        }
+
         return c; 
     }
 
@@ -25,7 +37,7 @@ const Board = () => {
       <div className="tiles">
         {ranks.map((rank, i) =>
           files.map((file, j) => (
-            <div key={file+'-'+rank} className={getClassName(9-i, j)}>
+            <div key={file+'-'+rank} className={getClassName(7-i, j)}>
               
             </div>
           )),
