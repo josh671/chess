@@ -58,4 +58,36 @@ export const getKngihtMoves = ({position, rank, file}) =>{
     })
     
     return moves; 
+} 
+
+export const getBishopMoves = ({position, piece, rank, file}) =>{
+    const moves = []; 
+    const us = piece[0]; 
+    const enemy = us === 'w' ? 'b' : 'w'; 
+    const candidates = [
+        [1, 1], 
+        [1, -1],
+        [-1, 1], 
+        [-1, -1]
+    ]
+
+    candidates.forEach(c =>{
+        for(let i = 1; i < 8; i++){
+            const x = rank + (i*c[0]);
+            const y = file + (i*c[1]); 
+
+            if(position?.[x]?.[y] === undefined)
+                break; 
+            if(position[x][y].startsWith(enemy)){
+                moves.push([x,y]); 
+                break;
+            }
+                 
+            if(position[x][y].startsWith(us))
+                break; 
+
+            moves.push([x,y])
+        }
+    })
+      return moves; 
 }
