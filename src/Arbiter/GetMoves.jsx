@@ -90,4 +90,11 @@ export const getBishopMoves = ({position, piece, rank, file}) =>{
         }
     })
       return moves; 
-}
+} 
+
+export const getQueenMoves = ({position, piece, rank, file}) =>{
+    const moves = []; 
+    const rookMoves = getRookMoves({position, piece, rank, file});
+    const bishopMoves = getBishopMoves({position, piece, rank, file});  
+    return [...rookMoves, ...bishopMoves]; 
+} 

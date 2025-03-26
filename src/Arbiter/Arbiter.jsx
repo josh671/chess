@@ -1,5 +1,5 @@
 //Arbitor controller that will contain methods from GetMoves file
-import {getKngihtMoves, getRookMoves, getBishopMoves} from './GetMoves'
+import {getKngihtMoves, getRookMoves, getBishopMoves, getQueenMoves} from './GetMoves'
 
 export const arbiter = {
     getRegularMoves : function({position, piece, rank, file}){
@@ -9,6 +9,8 @@ export const arbiter = {
             return getKngihtMoves({position, rank, file})
         if(piece.endsWith('b'))
             return getBishopMoves({position, piece, rank, file})
+        if(piece.endsWith('q'))
+            return getQueenMoves({position, piece, rank, file}) 
     }
 }
 
