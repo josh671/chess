@@ -51,7 +51,7 @@ export const getKngihtMoves = ({position, rank, file}) =>{
     //checks each candidate is a valid move and if so pushes to moves array. 
     candidates.forEach(c =>{
         const cell = position?.[rank+c[0]]?.[file+c[1]] 
-        if(cell != undefined && (cell.startsWith(enemy) || cell === '')){
+        if(cell !== undefined && (cell.startsWith(enemy) || cell === '')){
             moves.push([rank+c[0],file+c[1]])
         }
 
@@ -93,8 +93,27 @@ export const getBishopMoves = ({position, piece, rank, file}) =>{
 } 
 
 export const getQueenMoves = ({position, piece, rank, file}) =>{
-    const moves = []; 
     const rookMoves = getRookMoves({position, piece, rank, file});
     const bishopMoves = getBishopMoves({position, piece, rank, file});  
     return [...rookMoves, ...bishopMoves]; 
+} 
+
+export const getKingMoves = ({position, piece, rank, file}) =>{
+    const moves = []; 
+    const us = piece[0]; 
+     
+    const candidates = [
+        [1,1],[1,0],[1,-1],
+        [0,1],      [0,-1],
+        [-1,1],[-1,0],[-1,-1]
+    ]
+
+    candidates.forEach(c =>{
+            const x = rank + c[0];
+            const y = file + c[1]; 
+            if(position?.[x]?.[y] !== undefined && !position[x][y].startsWith(us)) 
+                 moves.push([x,y]);
+       
+    })
+      return moves; 
 } 
