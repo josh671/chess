@@ -4,10 +4,10 @@ export const getCharacter = file => String.fromCharCode(file + 96);
 export const createPosition =()=>{
     const position = new Array(8).fill('').map(x=> new Array(8).fill(''));
     // adds pawns to board 
-    // for(let i = 0; i < 8; i++){
-    //     position[6][i] = 'bp'; 
-    //     position[1][i] = 'wp'; 
-    // }
+    for(let i = 0; i < 8; i++){
+        position[6][i] = 'bp'; 
+        position[1][i] = 'wp'; 
+    }
     // positions for white pieces 
     position[0][0] = 'wr'; 
     position[0][1] = 'wn'; 
