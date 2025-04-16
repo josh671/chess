@@ -3,16 +3,13 @@ import './Board.css'
 import Files from './bits/Files.jsx'; 
 import Pieces from '../Pieces/Pieces.jsx';
 import { useAppContext } from '../Context/Context.jsx';
+import Popup from '../Popup/Popup.jsx'; 
+import PromotionBox from  '../Popup/PromotionBox/PromotionBox.jsx';
 const Board = () => {
 
 
-  const ranks = Array(8)
-    .fill()
-    .map((x, i) => 8 - i)
-  const files = Array(8)
-    .fill()
-    .map((x, i) => i + 1);
-
+  const ranks = Array(8).fill().map((x,i) => 8-i)
+  const files = Array(8).fill().map((x,i) => i+1)
   const {appState} = useAppContext(); 
   const position = appState.position[appState.position.length - 1]; 
 
@@ -37,13 +34,14 @@ const Board = () => {
       <div className="tiles">
         {ranks.map((rank, i) =>
           files.map((file, j) => (
-            <div key={file+'-'+rank} className={getClassName(7-i, j)}>
+            <div key={file+'-'+rank} j={j} i={i}className={getClassName(7-i, j)}>
               
             </div>
           )),
         )}
       </div>
       <Pieces/>
+      <Popup/>
       <Files files={files}/> 
     </div>
  
