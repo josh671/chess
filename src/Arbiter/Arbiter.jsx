@@ -1,6 +1,6 @@
 //Arbitor controller that will contain methods from GetMoves file
 import {getKngihtMoves, getRookMoves, getBishopMoves, getQueenMoves, getKingMoves, getPawnMoves, getPawnCaptures} from './GetMoves'
-
+import { movePawn, movePiece } from './Move';
 export const arbiter = {
     getRegularMoves : function({position, piece, rank, file}){
         if(piece.endsWith('r'))
@@ -28,5 +28,15 @@ export const arbiter = {
             ]
         }
         return moves; 
+    },
+
+
+    performMove: function({position, piece, rank, file, x, y}) {
+        if(piece.endsWith('p')){
+            return movePawn({position, piece, rank, file, x, y}); 
+
+        }else{
+            return movePiece({position, piece, rank, file, x, y});
+        }
     }
-}
+} 

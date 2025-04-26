@@ -3,25 +3,21 @@ import  {arbiter}  from "../../Arbiter/Arbiter";
 import { generateCandidateMoves } from "../Reducer/Actions/move";
 const Piece = ({piece, rank, file}) =>{
    
-    const {appState, dispatch } = useAppContext(); 
-    const { turn, position: currentPosition } = appState; 
+    const { appState, dispatch } = useAppContext();
+    const { turn, position : currentPosition } = appState
     
 
-    const getMoves = () => {
-       
-    }
-
     const onDragStart = e =>{
-        e.dataTransfer.effectAllowed='move'; 
-        e.dataTransfer.setData('text/plain', `${piece},${rank},${file}`)
-        setTimeout(()=>{
-            e.target.style.display='none' 
-        }, 0)
-
-        if(turn === piece[0]){
-            const candidateMoves = arbiter.getValidMoves({
-                position:currentPosition[currentPosition.length -1], 
-                prevPosition: currentPosition[currentPosition.length - 2], 
+        e.dataTransfer.effectAllowed = "move";
+         e.dataTransfer.setData("text/plain",`${piece},${rank},${file}`)
+         setTimeout(() => {
+             e.target.style.display = 'none'
+         },0)
+ 
+         if (turn === piece[0]){
+             const candidateMoves  = arbiter.getValidMoves({
+                position : currentPosition[currentPosition.length - 1],
+                prevPosition : currentPosition[currentPosition.length - 2],
                 piece, 
                 rank, 
                 file });  
@@ -29,7 +25,9 @@ const Piece = ({piece, rank, file}) =>{
         }
     }
 
-    const onDragEnd = e => e.target.style.display='block'
+    const onDragEnd = e =>{
+         e.target.style.display='block'
+    }
 
     return (
         <>
