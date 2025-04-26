@@ -39,6 +39,22 @@ export const reducer = (state, action)=>{
             }
         }
 
+        case actionTypes.PROMOTION_CLOSE : {
+            return {
+                ...state, 
+                status : Status.ongoing,
+                promotionSquare : null, 
+                
+            }
+        }
+
+        case actionTypes.SWITCH_TURN : {
+            return {
+                ...state, 
+                turn : state.turn === 'w' ? 'b' : 'w'
+            }
+        }
+
         default:
             return state
     }

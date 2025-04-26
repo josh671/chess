@@ -13,6 +13,9 @@ const Board = () => {
   const {appState} = useAppContext(); 
   const position = appState.position[appState.position.length - 1]; 
 
+  console.log('current turn: ', appState.turn); 
+
+
     const getClassName = (i, j) =>{
         let c = 'tile'; 
         c += (i + j) % 2 === 0 ? ' tile--dark' : ' tile--light'; 
@@ -41,7 +44,9 @@ const Board = () => {
         )}
       </div>
       <Pieces/>
-      <Popup/>
+      <Popup>
+        <PromotionBox/>
+      </Popup>
       <Files files={files}/> 
     </div>
  

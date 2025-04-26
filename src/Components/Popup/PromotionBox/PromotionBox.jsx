@@ -1,11 +1,14 @@
 import './PromotionBox.css'; 
 import { useAppContext } from '../../Context/Context.jsx';
-const PromotionBox = () =>{
+import { copyPosition } from '../../Board/helper.jsx';
+import { clearCandidates } from '../../Reducer/Actions/move.jsx';
+import { makeNewMove } from '../../Reducer/Actions/move.jsx';
+const PromotionBox = ({onClosePopup}) =>{
     const options = ['q','r','b','n']; 
     
-    const {appState} = useAppContext();
+    const {appState, dispatch} = useAppContext();
     const {promotionSquare} = appState; 
-    console.log(appState);
+ 
     if(!promotionSquare){ 
         return null; 
     }
@@ -36,9 +39,32 @@ const PromotionBox = () =>{
         return style; 
     }
 
+    const onClick = option =>{
+        onClosePopup(); 
+        const newPosition = copyPosition(appState.position[appState.position.length - 1]); 
+        
+        newPosition[promotionSquare.rank][promotionSquare.file] = ''; 
+        newPosition[promotionSquare.x][promotionSquare.y] = color + option; 
+        
+        dispatch(clearCandidates());
+        dispatch(makeNewMove({newPosition}));
+        dispatch({type: 'SWITCH_TURN'});
+        
+        
+         
+    }
+    
+
     return(
         <div className='popup-inner promotion-choices' style={getPromotionBoxPosition()}>
-            {options.map(option=><div key={option} className={`piece ${color}${option}`}></div>)}
+            {options.map(option=>
+            <div key={option} 
+            className={`piece ${color}${option}`}
+            onClick ={()=> onClick(option)} > 
+            
+            </div>
+            )
+        }
             </div>
     )
 }

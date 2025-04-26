@@ -4,6 +4,7 @@ const actionTypes = {
     "NEW_MOVE": "NEW_MOVE", 
     "PROMOTION_CLOSE" : "PROMOTION_CLOSE",
     "PROMOTION_OPEN" : "PROMOTION_OPEN",
+    "SWITCH_TURN" : "SWITCH_TURN",
 
 
      
