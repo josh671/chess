@@ -5,8 +5,8 @@ import { createPosition, copyPosition } from '../Board/helper'
 import { useAppContext } from '../Context/Context'
 import { makeNewMove, clearCandidates } from '../Reducer/Actions/move'
 import { openPromotion } from '../Reducer/Actions/popup'
-
-
+import { getCastlingDirections } from '../../Arbiter/GetMoves'  
+import { arbiter } from '../../Arbiter/Arbiter'
 
 
 const Pieces = () => {
@@ -34,24 +34,28 @@ const Pieces = () => {
   const move = (e) => {
     const { x, y } = calculateCoordinates(e)
 
-    const [p, rank, file] = e.dataTransfer.getData('text').split(',')
-    const newPosition = copyPosition(currentPosition)
-    if (appState.candidateMoves?.find((m) => m[0] === x && m[1] === y)) {
-     if((p === 'wp' && x === 7) || (p === 'bp' && x === 0)){
+    const [piece, rank, file] = e.dataTransfer.getData('text').split(',')
+    //shows pawn
+    console.log('p', piece);
+
+
+    if (appState.candidateMoves?.find(m => m[0] === x && m[1] === y)) {
+     if((piece === 'wp' && x === 7) || (piece === 'bp' && x === 0)){
          openPromotionBox({rank, file, x, y})
-         
+         return;
      }
+     console.log('moving', piece, rank, file, x, y);
+     console.log(currentPosition); 
 
-      if (p.endsWith('p') && !newPosition[x][y] && x !== rank && y !== file) {
-        newPosition[rank][y] = ''
-      }
-      newPosition[Number(rank)][Number(file)] = ''
-      newPosition[x][y] = p
-      dispatch(makeNewMove({ newPosition }))
-    }
-    dispatch(clearCandidates())
-  }
-
+     const newPosition = arbiter.performMove({
+      position:currentPosition,
+      piece,rank,file,
+      x,y
+  })
+  dispatch(makeNewMove({newPosition}))
+}
+dispatch(clearCandidates())
+}
   const onDrop = (e) => {
     e.preventDefault()
 

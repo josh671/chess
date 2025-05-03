@@ -5,9 +5,8 @@ const Piece = ({piece, rank, file}) =>{
    
     const { appState, dispatch } = useAppContext();
     const { turn, castleDirection, position : currentPosition } = appState
-  
-
-    const onDragStart = e =>{
+     
+     const onDragStart = e =>{
         e.dataTransfer.effectAllowed = "move";
          e.dataTransfer.setData("text/plain",`${piece},${rank},${file}`)
          setTimeout(() => {
@@ -22,6 +21,7 @@ const Piece = ({piece, rank, file}) =>{
                 piece, 
                 rank, 
                 file });  
+                
             dispatch(generateCandidateMoves({candidateMoves}))
         }
     }
