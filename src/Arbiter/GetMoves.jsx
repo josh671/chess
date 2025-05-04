@@ -217,6 +217,7 @@ export const getCastlingMoves = ({position, castleDirection, piece, rank, file})
 }
 
 export const getCastlingDirections = ({castleDirection,piece,file,rank}) => {
+   
     const direction = castleDirection[piece[0]]
     if (piece.endsWith('k'))
         return 'none'
