@@ -87,6 +87,7 @@ const updateCastlingState = ({piece, rank, file}) =>{
     e.preventDefault()
 
     move(e)
+    console.log(appState);  
   }
 
   const onDragOver = (e) => {
