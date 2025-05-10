@@ -1,5 +1,5 @@
 //Arbitor controller that will contain methods from GetMoves file
-import {getKngihtMoves, getRookMoves, getBishopMoves, getQueenMoves, getKingMoves, getPawnMoves, getPawnCaptures, getCastlingMoves} from './GetMoves'
+import {getKngihtMoves, getRookMoves, getBishopMoves, getQueenMoves, getKingMoves, getPawnMoves, getPawnCaptures, getCastlingMoves, getKingPosition, getPieces} from './GetMoves'
 import { movePawn, movePiece } from './Move';
 export const arbiter = {
     getRegularMoves : function({position, piece, rank, file}){
@@ -20,7 +20,8 @@ export const arbiter = {
 
     getValidMoves : function({position, castleDirection, prevPosition, piece, rank, file}){
         let moves = this.getRegularMoves({position, piece, rank, file});
-        
+        const notInCheckMoves = [];
+
         if(piece.endsWith('p')){
             moves = [
                 ...moves, 
@@ -29,27 +30,58 @@ export const arbiter = {
             ]
         }
         // check for valid castling moves 
-        if(piece.endsWith('k')){
+        if(piece.endsWith('k'))
             moves = [
                 ...moves, 
                 ...getCastlingMoves({position, castleDirection, piece, rank, file}), 
 
             ]
-        }
-    
-        return moves; 
+            //check if castle is in check 
+            moves.forEach(([x,y]) =>{
+                const positionAfterMove = this.performMove({position, piece, rank, file, x, y}); 
+
+                if(!this.isPlayerInCheck({positionAfterMove, position, player: piece[0]})){
+                    notInCheckMoves.push([x,y]); 
+                }
+
+            })
+           console.log('notInCheckMoves', notInCheckMoves);
+            return notInCheckMoves; 
     },
 
-
+    
     performMove: function({position, piece, rank, file, x, y}) {
-         console.log('performMove', {position, piece, rank, file, x, y}); 
         if(piece.endsWith('p')){
-            console.log('moving pawn', {position, piece, rank, file, x, y});
             return movePawn({position, piece, rank, file, x, y}); 
 
         }else{
           
             return movePiece({position, piece, rank, file, x, y});
         }
+    }, 
+
+    isPlayerInCheck: function({positionAfterMove, position, player}){
+        const enemy = player.startsWith('w') ? 'b' : 'w'; 
+        
+        let kingPosition = getKingPosition(positionAfterMove, player); 
+        const enemyPieces = getPieces(positionAfterMove, enemy); 
+
+        const enemyMoves = enemyPieces.reduce((acc, p) => acc = [
+            ...acc, 
+            ...(p.piece.endsWith('p')) 
+            ? getPawnCaptures({
+                position: positionAfterMove, 
+                prevPosition: position, 
+                ...p 
+            })
+            : this.getRegularMoves({
+                position: positionAfterMove, 
+                ...p 
+            })
+        ], [])
+        if(enemyMoves.some(([x,y]) => kingPosition[0] === x && kingPosition[1] === y))
+            return true; 
+        
+        return false; 
     }
 } 

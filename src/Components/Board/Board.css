@@ -45,3 +45,15 @@
     border: 6px solid var(--highlight); 
     
 }
+
+.checked:after{
+    display: block; 
+    position: absolute; 
+    content: ''; 
+    width: calc(var(--tile-size)); 
+    height: calc(var(--tile-size)); 
+    background: var(--checked);  
+    border-radius: 20%; 
+    left: 0%; 
+    top: 0%; 
+}

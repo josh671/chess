@@ -6,7 +6,7 @@ import { useAppContext } from '../Context/Context.jsx';
 import Popup from '../Popup/Popup.jsx'; 
 import PromotionBox from  '../Popup/PromotionBox/PromotionBox.jsx';
 import { arbiter } from '../../Arbiter/Arbiter.jsx'; 
-
+import { getKingPosition } from '../../Arbiter/GetMoves.jsx';
 
 const Board = () => {
 
@@ -16,7 +16,17 @@ const Board = () => {
   const {appState} = useAppContext(); 
   const position = appState.position[appState.position.length - 1]; 
   
+  const isChecked = (() =>{
+    const isInCheck = arbiter.isPlayerInCheck({
+      positionAfterMove: position, 
+      player: appState.turn, 
 
+    })
+    if(isInCheck){
+      return getKingPosition(position, appState.turn); 
+    }
+    return null; 
+  })()
 
     const getClassName = (i, j) =>{
         let c = 'tile'; 
@@ -28,7 +38,9 @@ const Board = () => {
           else
             c+= ' highlight'
         }
-
+        if(isChecked && isChecked[0] === i && isChecked[1] === j){
+          c+= ' checked'; 
+        } 
         return c; 
     }
 
