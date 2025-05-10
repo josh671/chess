@@ -20,6 +20,7 @@ export const arbiter = {
 
     getValidMoves : function({position, castleDirection, prevPosition, piece, rank, file}){
         let moves = this.getRegularMoves({position, piece, rank, file});
+        
         if(piece.endsWith('p')){
             moves = [
                 ...moves, 
@@ -35,15 +36,19 @@ export const arbiter = {
 
             ]
         }
+    
         return moves; 
     },
 
 
     performMove: function({position, piece, rank, file, x, y}) {
+         console.log('performMove', {position, piece, rank, file, x, y}); 
         if(piece.endsWith('p')){
+            console.log('moving pawn', {position, piece, rank, file, x, y});
             return movePawn({position, piece, rank, file, x, y}); 
 
         }else{
+          
             return movePiece({position, piece, rank, file, x, y});
         }
     }

@@ -14,6 +14,7 @@ export const initGameState = {
     candidateMoves :  [],
     status: Status.ongoing, 
     promotionSquare: null, 
+    moveList: [],
     castleDirection : {
         w : 'both', 
         b : 'both', 

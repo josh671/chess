@@ -1,20 +1,21 @@
 import actionTypes from "./Actions/actionTypes"
 import { Status } from "../../Constants"
 export const reducer = (state, action)=>{
-    switch(action.type){
-        case actionTypes.NEW_MOVE: {
-            let {turn, position} = state
+    switch (action.type) {
+        case actionTypes.NEW_MOVE : {
+            let {position, turn} = state 
             position = [
-                ...position, 
+                ...position,
                 action.payload.newPosition
             ]
-
-            turn = turn ==='w' ? 'b' : 'w' 
             
+            turn = turn === 'w' ? 'b' : 'w'
+
             return {
-                ...state, 
+                ...state,
+                position,
+              
                 turn,
-                position
             }
         }
 
@@ -55,9 +56,19 @@ export const reducer = (state, action)=>{
             }
         }
 
-        default:
-            return state
+    
+    case actionTypes.CAN_CASTLE : {
+        let {turn,castleDirection} = state 
+    
+        castleDirection[turn] = action.payload
+        
+        return {
+            ...state,
+            castleDirection,
+        }
     }
 
-
+    default : 
+        return state
+    }
 }
