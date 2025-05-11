@@ -7,7 +7,7 @@ import Popup from '../Popup/Popup.jsx';
 import PromotionBox from  '../Popup/PromotionBox/PromotionBox.jsx';
 import { arbiter } from '../../Arbiter/Arbiter.jsx'; 
 import { getKingPosition } from '../../Arbiter/GetMoves.jsx';
-
+import GameEnds from '../Popup/GameEnds/GameEnds.jsx';
 const Board = () => {
 
 
@@ -60,6 +60,7 @@ const Board = () => {
       <Pieces/>
       <Popup>
         <PromotionBox/>
+        <GameEnds />
       </Popup>
       <Files files={files}/> 
     </div>
