@@ -7,7 +7,7 @@ import { makeNewMove, clearCandidates } from '../Reducer/Actions/move'
 import { openPromotion } from '../Reducer/Actions/popup'
 import { getCastlingDirections } from '../../Arbiter/GetMoves'
 import { arbiter } from '../../Arbiter/Arbiter'
-import { detectStalemate, updateCastling } from '../Reducer/Actions/game'
+import { detectStalemate, updateCastling, detectInsufficientMaterial } from '../Reducer/Actions/game'
 
 const Pieces = () => {
   const ref = useRef()
@@ -78,7 +78,9 @@ const updateCastlingState = ({piece, rank, file}) =>{
 
       dispatch(makeNewMove({ newPosition }))
 
-      if(arbiter.isStalemate(newPosition, opponent, castleDirection)){
+      if(arbiter.insufficientMaterial(newPosition)){
+        dispatch(detectInsufficientMaterial()); 
+      }else if(arbiter.isStalemate(newPosition, opponent, castleDirection)){
         dispatch(detectStalemate()); 
       }
         

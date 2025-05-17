@@ -9,14 +9,14 @@ export const createPosition =()=>{
   //     position[1][i] = 'wp'; 
   // }
   // // positions for white pieces 
-     position[0][0] = 'wr'; 
+  //   position[0][0] = 'wr'; 
   //   position[0][1] = 'wn'; 
   //   position[0][2] = 'wb'; 
   //   position[0][3] = 'wq'; 
-     position[7][5] = 'wk'; 
+     position[5][7] = 'wk'; 
   //   position[0][5] = 'wb'; 
   //   position[0][6] = 'wn'; 
-  //   position[0][7] = 'wr'; 
+  //   position[1][7] = 'wb'; 
 
   //   // positions for black pieces 
   //   position[7][0] = 'br'; 
@@ -42,7 +42,20 @@ export const copyPosition = (position) =>{
     return newPosition; 
 }
 
-
+ export const areSameColorTiles = (coords1, coords2) => 
+  (coords1.x + coords1.y) % 2 === (coords2.x + coords2.y) % 2
+ 
+ export const findPieceCoords = (position, type) => {
+    let results = []; 
+    position.forEach((rank, i) =>{ 
+      rank.forEach((pos, j) =>{
+        if(pos === type){
+          results.push({x: i, y: j}); 
+        }
+      })
+    })
+    return results; 
+ }
 
 
 export const getNewMoveNotation = ({
