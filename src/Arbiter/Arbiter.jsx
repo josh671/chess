@@ -1,4 +1,5 @@
 //Arbitor controller that will contain methods from GetMoves file
+import { areSameColorTiles, findPieceCoords } from '../Components/Board/helper';
 import {getKngihtMoves, getRookMoves, getBishopMoves, getQueenMoves, getKingMoves, getPawnMoves, getPawnCaptures, getCastlingMoves, getKingPosition, getPieces} from './GetMoves'
 import { movePawn, movePiece } from './Move';
 export const arbiter = {
@@ -102,5 +103,34 @@ export const arbiter = {
         ],[])
 
         return (!isInCheck && moves.length === 0); 
-    }
+    }, 
+
+    insufficientMaterial: function(position){
+        const pieces = position.reduce((acc, rank) =>
+            acc = [
+                ...acc, 
+                ...rank.filter(x => x)
+
+            ], [])
+        
+        if(pieces.length === 2){
+            return true; 
+        }
+        if(pieces.length === 3 && (pieces.some(p => p.endsWith('n')) || pieces.some(p =>p.endsWith('b')))){
+            return true; 
+        }
+
+        if(pieces.length === 4 && 
+            pieces.every(p => p.endsWith('b') || p.endsWith('k')) && 
+            new Set(pieces).size === 4 && 
+            areSameColorTiles(
+                findPieceCoords(position, 'wb')[0],
+                findPieceCoords(position, 'bb')[0],
+                
+            )){
+                return true; 
+         }
+        return false;
+        },
+    
 } 
