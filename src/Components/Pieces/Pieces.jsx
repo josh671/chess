@@ -7,7 +7,7 @@ import { makeNewMove, clearCandidates } from '../Reducer/Actions/move'
 import { openPromotion } from '../Reducer/Actions/popup'
 import { getCastlingDirections } from '../../Arbiter/GetMoves'
 import { arbiter } from '../../Arbiter/Arbiter'
-import { updateCastling } from '../Reducer/Actions/game'
+import { detectStalemate, updateCastling } from '../Reducer/Actions/game'
 
 const Pieces = () => {
   const ref = useRef()
@@ -49,10 +49,13 @@ const updateCastlingState = ({piece, rank, file}) =>{
   //takes care of moving the piece
   const move = (e) => {
     const { x, y } = calculateCoordinates(e)
-
+  
     const [piece, rank, file] = e.dataTransfer.getData('text').split(',')
 
     if (appState.candidateMoves?.find((m) => m[0] === x && m[1] === y)) {
+      const opponent = piece.startsWith('b') ? 'w' : 'b'; 
+      const castleDirection = appState.castleDirection[`${piece.startsWith('b') ? 'w' : 'b'}`] 
+      
       // checks if pawn needs to be promoted
       if ((piece === 'wp' && x === 7) || (piece === 'bp' && x === 0)) {
         openPromotionBox({ rank, file, x, y })
@@ -64,10 +67,6 @@ const updateCastlingState = ({piece, rank, file}) =>{
         updateCastlingState({piece, rank, file}); 
       }
 
-      
-
-
-
       const newPosition = arbiter.performMove({
         position: currentPosition,
         piece,
@@ -77,9 +76,13 @@ const updateCastlingState = ({piece, rank, file}) =>{
         y,
       }) 
 
-
-
       dispatch(makeNewMove({ newPosition }))
+
+      if(arbiter.isStalemate(newPosition, opponent, castleDirection)){
+        dispatch(detectStalemate()); 
+      }
+        
+      
     }
     dispatch(clearCandidates())
   }
@@ -87,7 +90,7 @@ const updateCastlingState = ({piece, rank, file}) =>{
     e.preventDefault()
 
     move(e)
-    console.log(appState);  
+     
   }
 
   const onDragOver = (e) => {
