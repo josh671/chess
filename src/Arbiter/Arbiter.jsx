@@ -46,7 +46,7 @@ export const arbiter = {
                 }
 
             })
-           console.log('notInCheckMoves', notInCheckMoves);
+           
             return notInCheckMoves; 
     },
 
@@ -80,10 +80,10 @@ export const arbiter = {
                 ...p 
             })
         ], [])
-        if(enemyMoves.some(([x,y]) => kingPosition[0] === x && kingPosition[1] === y))
+        console.log(enemyMoves)
+        if(enemyMoves.some(([x,y]) => kingPosition[0] === x && kingPosition[1] === y)){
             return true; 
-        
-        else return false; 
+        } else return false; 
     }, 
 
     isStalemate: function(position, player, castleDirection){ 
@@ -133,4 +133,22 @@ export const arbiter = {
         return false;
         },
     
+    isCheckMate: function(position, player, castleDirection){ 
+        const isInCheck = this.isPlayerInCheck({positionAfterMove: position, player})
+        if(!isInCheck)
+            return false; 
+
+        const pieces = getPieces(position, player); 
+        const moves = pieces.reduce((acc, p) => acc = [
+            ...acc, 
+            ...(this.getValidMoves({
+                position, 
+                castleDirection, 
+                ...p
+            })
+        )
+        ],[])
+
+        return (isInCheck && moves.length === 0); 
+    }, 
 } 

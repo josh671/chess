@@ -14,7 +14,7 @@ const Popup = ({children})=>{
         return null; 
     }
     return(
-        <div className='popup'>
+        <div className="popup">
              {React.Children
             .toArray(children)
             .map(child => React.cloneElement(child, { onClosePopup }))}
