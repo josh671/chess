@@ -56,7 +56,7 @@ const PromotionBox = ({onClosePopup}) =>{
     
 
     return(
-        <div className='popup-inner promotion-choices' style={getPromotionBoxPosition()}>
+        <div className='popup--inner promotion-choices' style={getPromotionBoxPosition()}>
             {options.map(option=>
             <div key={option} 
             className={`piece ${color}${option}`}
