@@ -80,7 +80,7 @@ export const arbiter = {
                 ...p 
             })
         ], [])
-        console.log(enemyMoves)
+        
         if(enemyMoves.some(([x,y]) => kingPosition[0] === x && kingPosition[1] === y)){
             return true; 
         } else return false; 
