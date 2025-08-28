@@ -9,12 +9,11 @@ import { arbiter } from '../../Arbiter/Arbiter.jsx'
 import { getKingPosition } from '../../Arbiter/GetMoves.jsx'
 import GameEnds from '../Popup/GameEnds/GameEnds.jsx'
 import { useEffect } from 'react'
-import { useSocket } from '../Context/SocketContenxt.jsx'
-import { updateCastling } from '../Reducer/Actions/game.jsx'
+
 
 const Board = () => {
-  const socket = useSocket()
-  const { appState, dispatch } = useAppContext()
+   
+  const { appState, dispatch, socket, playerColor, roomId} = useAppContext()
   const position = appState.position[appState.position.length - 1]
 
   const ranks = Array(8)
@@ -26,42 +25,30 @@ const Board = () => {
 
 
 
-  // ✅ Step 4: WebSocket Connection + Handlers
   useEffect(() => {
     if (!socket) return
-
-    const handleConnect = () => {
-      console.log('✅ Socket connected:', socket.id)
-      socket.emit('joinRoom', 'room1')
-      console.log('📤 joinRoom emitted')
-    }
+    
 
     const handleMoveResult = ({ newPosition, turn }) => {
-      console.log('Received updated board:', newPosition)
-      console.log('Current turn:', turn)
       // Dispatch your action to update app state
-      dispatch({ type: 'NEW_MOVE', payload: { newPosition, turn } })
-    }
+      dispatch({ type: 'NEW_MOVE', payload: { newPosition, turn } }) 
 
-    if (socket.connected) {
-      handleConnect() // already connected
+      
     }
+     
+      socket.on('moveResult', handleMoveResult)
+      socket.off('connect', handleMoveResult)
 
-    socket.on('connect', handleConnect)
-    socket.on('moveResult', handleMoveResult)
-
-    return () => {
-      socket.off('connect', handleConnect)
-    }
   }, [socket, dispatch])
 
 
-  
+  //Need to emit this to back end 
   const isChecked = (() => {
     const isInCheck = arbiter.isPlayerInCheck({
       positionAfterMove: position,
       player: appState.turn,
     })
+    console.log('isInCheck', isInCheck)
     if (isInCheck) {
       return getKingPosition(position, appState.turn)
     }
