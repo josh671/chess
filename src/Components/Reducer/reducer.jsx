@@ -41,10 +41,13 @@ export const reducer = (state, action)=>{
         }
 
         case actionTypes.PROMOTION_CLOSE : {
+            let {turn} = state 
+            turn = turn === 'w' ? 'b' : 'w'
             return {
                 ...state, 
                 status : Status.ongoing,
                 promotionSquare : null, 
+                turn, 
                 
             }
         }
@@ -65,6 +68,7 @@ export const reducer = (state, action)=>{
         return {
             ...state,
             castleDirection,
+            
         }
     }
 

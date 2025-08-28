@@ -2,9 +2,10 @@ import { initGameState } from "../../../Constants"
 import actionTypes from "./actionTypes" 
 
 export const updateCastling = (direction) => {
+    console.log("Game Updating castling direction",direction.action.payload); 
     return {
         type: actionTypes.CAN_CASTLE,
-        payload: direction,
+        payload: direction.action,
     }
 }
 

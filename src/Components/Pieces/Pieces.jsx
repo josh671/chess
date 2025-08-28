@@ -1,19 +1,17 @@
 import './Pieces.css'
 import Piece from './Piece'
-import { useState, useRef } from 'react'
-import { createPosition, copyPosition } from '../Board/helper'
+import { useRef } from 'react'
 import { useAppContext } from '../Context/Context'
-import { makeNewMove, clearCandidates } from '../Reducer/Actions/move'
-import { openPromotion } from '../Reducer/Actions/popup'
+import {   openPromotion } from '../Reducer/Actions/popup'
+import { clearCandidates } from '../Reducer/Actions/move'
 import { getCastlingDirections } from '../../Arbiter/GetMoves'
-import { arbiter } from '../../Arbiter/Arbiter'
-import { detectStalemate, updateCastling, detectInsufficientMaterial, detectCheckMate } from '../Reducer/Actions/game'
+import { useSocket } from '../Context/SocketContenxt'
+import { updateCastling, detectStalemate, detectInsufficientMaterial, detectCheckMate } from '../Reducer/Actions/game'
 
 const Pieces = () => {
   const ref = useRef()
-
+  const socket = useSocket()
   const { appState, dispatch } = useAppContext()
-
   const currentPosition = appState.position[appState.position.length - 1]
 
   const calculateCoordinates = (e) => {
@@ -23,80 +21,85 @@ const Pieces = () => {
     const x = 7 - Math.floor((e.clientY - top) / size)
     return { x, y }
   }
-// opens promotion box for pawn
-  const openPromotionBox = ({ rank, file, x, y }) => {
-    dispatch(openPromotion({ rank: Number(rank), file: Number(file), x, y }))
-  }
-
-
-//checks & updates castling directions 
-const updateCastlingState = ({piece, rank, file}) =>{
-  console.log('piece:', piece, 'rank:', rank, 'file:', file);
-
-
-  const direction = getCastlingDirections({
-    castleDirection: appState.castleDirection, 
-    piece, file, rank 
-  }); 
-
-  if(direction){
-    dispatch(updateCastling(direction)) 
-  }
-}
-
-
-
-  //takes care of moving the piece
+  // STILL PROBLEMS WITH CASTLING 
   const move = (e) => {
     const { x, y } = calculateCoordinates(e)
-  
     const [piece, rank, file] = e.dataTransfer.getData('text').split(',')
 
     if (appState.candidateMoves?.find((m) => m[0] === x && m[1] === y)) {
-      const opponent = piece.startsWith('b') ? 'w' : 'b'; 
-      const castleDirection = appState.castleDirection[`${piece.startsWith('b') ? 'w' : 'b'}`] 
+      const opponent = piece.startsWith('b') ? 'w' : 'b'
+
+   const handleCastleUpdate = (direction)=>{
+    console.log('castle direction', direction.action); 
+    
+      if(direction)
+        dispatch(updateCastling(direction));
+   }
+
+   const openPromotionBox = (promotionInfo) =>{
+    console.log("Promotion info", promotionInfo);
+    if(!promotionInfo) return
+     
+    dispatch(promotionInfo.action); 
+   }
+
+
+    console.log(appState)
+      if (!socket) return
+
       
-      // checks if pawn needs to be promoted
-      if ((piece === 'wp' && x === 7) || (piece === 'bp' && x === 0)) {
-        openPromotionBox({ rank, file, x, y })
-        return
-      }
+      // ⬇️ Castling Handler
+  if(piece.endsWith('k') || piece.endsWith('r')){
+    console.log("sending castling update"); 
+      socket.emit('castlingUpdate', {
+        roomId: 'room1', 
+        castleDirection: appState.castleDirection, 
+        piece, 
+        rank,
+        file
+      })
+  }
+    
 
-      // checks if castling is possible
-      if((piece.endsWith('k')) || (piece.endsWith('r'))){
-        updateCastlingState({piece, rank, file}); 
-      }
+      
+     
+      // Promotion Handler 
+      socket.emit('makePromotion', {
+        roomId: 'room1', 
+        piece, 
+        rank, 
+        file, 
+        x, 
+        y 
 
-      const newPosition = arbiter.performMove({
-        position: currentPosition,
+      })
+
+
+      // Move Handler
+      socket.emit('makeMove', {
+        roomId: 'room1',
+        currentPosition,
         piece,
         rank,
         file,
         x,
         y,
+        candidateMoves: appState.candidateMoves,
+        
       }) 
 
-      dispatch(makeNewMove({ newPosition }))
-
-      if(arbiter.insufficientMaterial(newPosition)){
-        dispatch(detectInsufficientMaterial()); 
-      }
-      else if(arbiter.isStalemate(newPosition, opponent, castleDirection)){
-        dispatch(detectStalemate()); 
-      }
-      else if(arbiter.isCheckMate(newPosition, opponent, castleDirection)){
-        dispatch(detectCheckMate(piece[0])); 
-      }
-        
       
+      socket.on("castlingUpdate", handleCastleUpdate); 
+      socket.on("openPromotionBox", openPromotionBox); 
+       
     }
+ console.log("new appState", appState)
     dispatch(clearCandidates())
   }
+
   const onDrop = (e) => {
     e.preventDefault()
-
     move(e)
-     
   }
 
   const onDragOver = (e) => {
@@ -114,8 +117,8 @@ const updateCastlingState = ({piece, rank, file}) =>{
               piece={currentPosition[rank][file]}
               key={rank + '-' + file}
             />
-          ) : null,
-        ),
+          ) : null
+        )
       )}
     </div>
   )
