@@ -58,8 +58,7 @@ const Pieces = () => {
       }
 
       const isCheckmateHandler = (isCheckmate) =>{
-        console.log("isCheckmate", isCheckmate.winner);
-        dispatch(detectCheckMate(isCheckmate.winner))
+        dispatch(detectCheckMate(isCheckmate[0]))
         
       }
 
