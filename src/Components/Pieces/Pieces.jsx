@@ -58,17 +58,38 @@ const Pieces = () => {
       }
 
       const isCheckmateHandler = (isCheckmate) =>{
-        console.log("isCheckmate", isCheckmate);
-        dispatch(detectCheckMate(isCheckmate[0]))
+        console.log("isCheckmate", isCheckmate.winner);
+        dispatch(detectCheckMate(isCheckmate.winner))
         
       }
 
       console.log(appState)
       if (!socket) return
 
-    
+      // ⬇️ Castling Handler
+      if (piece.endsWith('k') || piece.endsWith('r')) {
+        console.log('sending castling update')
+        socket.emit('castlingUpdate', {
+          roomId,
+          castleDirection: appState.castleDirection,
+          piece,
+          rank,
+          file,
+        })
+      }
 
-       
+      
+      
+
+      // Promotion Handler
+      socket.emit('makePromotion', {
+        roomId,
+        piece,
+        rank,
+        file,
+        x,
+        y,
+      })
 
       // Move Handler
       socket.emit('makeMove', {
@@ -82,28 +103,6 @@ const Pieces = () => {
         candidateMoves: appState.candidateMoves,
         castleDirection: appState.castleDirection, 
         opponent
-      })
-
-         // ⬇️ Castling Handler
-      if (piece.endsWith('k') || piece.endsWith('r')) {
-        console.log('sending castling update')
-        socket.emit('castlingUpdate', {
-          roomId,
-          castleDirection: appState.castleDirection,
-          piece,
-          rank,
-          file,
-        })
-      }
-
-        // Promotion Handler
-      socket.emit('makePromotion', {
-        roomId,
-        piece,
-        rank,
-        file,
-        x,
-        y,
       })
 
       socket.on('castlingUpdate', handleCastleUpdate)
