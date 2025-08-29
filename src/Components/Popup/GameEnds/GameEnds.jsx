@@ -5,7 +5,7 @@ import { setupNewGame } from '../../Reducer/Actions/game.jsx';
 const GameEnds = ({onClosePopup}) => {
 
     const { appState : {status} , dispatch } = useAppContext();
-    
+         
     if (status === Status.ongoing || status === Status.promoting)
         return null
 
