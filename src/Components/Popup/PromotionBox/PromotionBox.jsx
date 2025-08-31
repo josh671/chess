@@ -47,8 +47,8 @@ const PromotionBox = ({onClosePopup}) =>{
         onClosePopup(); 
          const newPosition = copyPosition(appState.position[appState.position.length - 1]); 
         
-         newPosition[promotionSquare.rank][promotionSquare.file] = ''; 
-         newPosition[promotionSquare.x][promotionSquare.y] = color + option; 
+        //  newPosition[promotionSquare.rank][promotionSquare.file] = ''; 
+        //  newPosition[promotionSquare.x][promotionSquare.y] = color + option; 
         
        console.log('popup Socket',   roomId, 
             newPosition, 
