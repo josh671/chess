@@ -1,6 +1,8 @@
 import actionTypes from "./Actions/actionTypes"
 import { Status } from "../../Constants"
 export const reducer = (state, action)=>{
+    console.log('Reducer action:', action);
+    console.log('Reducer state:', state);
     switch (action.type) {
         case actionTypes.NEW_MOVE : {
             let {position, turn} = state 
@@ -9,11 +11,11 @@ export const reducer = (state, action)=>{
                 action.payload.newPosition
             ]
             
-             turn = turn === 'w' ? 'b' : 'w'
+            turn = action.payload.turn
 
             return {
                 ...state,
-                position:[...state.position, action.payload.newPosition],
+                position,
               
                 turn,
             }
@@ -42,7 +44,7 @@ export const reducer = (state, action)=>{
 
         case actionTypes.PROMOTION_CLOSE : {
             let {turn} = state 
-            
+            turn = turn === 'w' ? 'b' : 'w'
             return {
                 ...state, 
                 status : Status.ongoing,
