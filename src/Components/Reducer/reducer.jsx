@@ -9,11 +9,11 @@ export const reducer = (state, action)=>{
                 action.payload.newPosition
             ]
             
-            turn = turn === 'w' ? 'b' : 'w'
+             turn = turn === 'w' ? 'b' : 'w'
 
             return {
                 ...state,
-                position,
+                position:[...state.position, action.payload.newPosition],
               
                 turn,
             }
@@ -42,7 +42,7 @@ export const reducer = (state, action)=>{
 
         case actionTypes.PROMOTION_CLOSE : {
             let {turn} = state 
-            turn = turn === 'w' ? 'b' : 'w'
+            
             return {
                 ...state, 
                 status : Status.ongoing,

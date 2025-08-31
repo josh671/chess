@@ -17,10 +17,10 @@ const Pieces = () => {
   const ref = useRef()
   const { appState, dispatch, socket, playerColor, roomId } = useAppContext()
   const currentPosition = appState.position[appState.position.length - 1]
-  console.log('pieces playerColor', playerColor)
-  console.log('pieces roomId', roomId)
-  console.log(socket)
-  console.log('pieces appState', appState)
+  // console.log('pieces playerColor', playerColor)
+  // console.log('pieces roomId', roomId)
+  // console.log(socket)
+  // console.log('pieces appState', appState)
 
   const calculateCoordinates = (e) => {
     const { width, left, top } = ref.current.getBoundingClientRect()
@@ -43,6 +43,10 @@ const Pieces = () => {
 
     if (appState.candidateMoves?.find((m) => m[0] === x && m[1] === y)) {
       const opponent = piece.startsWith('b') ? 'w' : 'b'
+
+
+
+
 
       const handleCastleUpdate = (direction) => {
         console.log('castle direction', direction.action)
@@ -81,7 +85,8 @@ const Pieces = () => {
       
 
       // Promotion Handler
-      socket.emit('makePromotion', {
+      if((piece=== 'wp' && x === 7) || (piece === 'bp' && x === 0)){
+          socket.emit('makePromotion', {
         roomId,
         piece,
         rank,
@@ -89,6 +94,8 @@ const Pieces = () => {
         x,
         y,
       })
+      }
+       
 
       // Move Handler
       socket.emit('makeMove', {

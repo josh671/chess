@@ -3,10 +3,14 @@ import { useAppContext } from '../../Context/Context.jsx';
 import { copyPosition } from '../../Board/helper.jsx';
 import { clearCandidates } from '../../Reducer/Actions/move.jsx';
 import { makeNewMove } from '../../Reducer/Actions/move.jsx';
+import { useSocket } from '../../Context/SocketContenxt.jsx';
+import { useRef } from 'react';
 const PromotionBox = ({onClosePopup}) =>{
+    const ref = useRef() 
     const options = ['q','r','b','n']; 
-    
-    const {appState, dispatch} = useAppContext();
+     
+    const { appState , dispatch, socket, roomId, rank, file, x, y } = useAppContext()
+   console.log('popup onClose ', onClosePopup)  
     const {promotionSquare} = appState; 
  
     if(!promotionSquare){ 
@@ -41,14 +45,29 @@ const PromotionBox = ({onClosePopup}) =>{
 
     const onClick = option =>{
         onClosePopup(); 
-        const newPosition = copyPosition(appState.position[appState.position.length - 1]); 
+         const newPosition = copyPosition(appState.position[appState.position.length - 1]); 
         
-        newPosition[promotionSquare.rank][promotionSquare.file] = ''; 
-        newPosition[promotionSquare.x][promotionSquare.y] = color + option; 
+         newPosition[promotionSquare.rank][promotionSquare.file] = ''; 
+         newPosition[promotionSquare.x][promotionSquare.y] = color + option; 
         
-        dispatch(clearCandidates());
-        dispatch(makeNewMove({newPosition}));
-        dispatch({type: 'SWITCH_TURN'});
+       console.log('popup Socket',   roomId, 
+            newPosition, 
+            promotionSquare.rank, 
+            promotionSquare.file, 
+             promotionSquare.x, 
+             promotionSquare.y, 
+             color + option, ); 
+        
+
+        socket.emit('promotePawn', {
+            roomId: roomId, 
+            newPosition, 
+            rank: promotionSquare.rank, 
+            file: promotionSquare.file, 
+            x: promotionSquare.x, 
+            y: promotionSquare.y, 
+            piece: color + option,
+        })
         
         
          

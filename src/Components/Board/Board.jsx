@@ -33,11 +33,11 @@ const Board = () => {
       // Dispatch your action to update app state
       dispatch({ type: 'NEW_MOVE', payload: { newPosition, turn } }) 
 
-      
+      console.log('New position received from server:', newPosition, turn)
     }
      
       socket.on('moveResult', handleMoveResult)
-      socket.off('connect', handleMoveResult)
+      return () => socket.off('moveResult', handleMoveResult); 
 
   }, [socket, dispatch])
 
@@ -67,7 +67,7 @@ const Board = () => {
     }
     return c
   }
-
+console.log('board appstate', appState)
   return (
     <div className="board">
       <Ranks ranks={ranks} />
