@@ -22,7 +22,7 @@ const Board = () => {
   const files = Array(8)
     .fill()
     .map((x, i) => i + 1)
-
+//  WORKING BUT NEED TO FIX WRONG CHECKMATE WINNER 
 
 
   useEffect(() => {
