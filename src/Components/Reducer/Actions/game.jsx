@@ -17,6 +17,7 @@ export const detectStalemate = () => {
 }
 
 export const detectCheckMate = (winner) => {
+    console.log('Detecting checkmate for', winner);
     return {
         type: actionTypes.WIN,
         payload: winner,

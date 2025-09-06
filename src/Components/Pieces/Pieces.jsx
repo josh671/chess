@@ -59,10 +59,13 @@ const Pieces = () => {
         if (!promotionInfo) return
 
         dispatch(promotionInfo.action)
+        return;
       }
 
       const isCheckmateHandler = (isCheckmate) =>{
-        dispatch(detectCheckMate(isCheckmate[0]))
+        // dispatch(detectCheckMate(isCheckmate[0]))
+        console.log('isCheckmateHandler', isCheckmate); 
+        dispatch(isCheckmate); 
         
       }
 
@@ -81,24 +84,9 @@ const Pieces = () => {
         })
       }
 
-      
-      
-
-      // Promotion Handler
-      if((piece=== 'wp' && x === 7) || (piece === 'bp' && x === 0)){
-          socket.emit('makePromotion', {
-        roomId,
-        piece,
-        rank,
-        file,
-        x,
-        y,
-      })
-      }
-       
-
       // Move Handler
       socket.emit('makeMove', {
+        type: 'MAKE_MOVE',
         roomId,
         currentPosition,
         piece,
