@@ -3,16 +3,8 @@ import { useEffect } from 'react'
 import Piece from './Piece'
 import { useRef } from 'react'
 import { useAppContext } from '../Context/Context'
-import { openPromotion } from '../Reducer/Actions/popup'
 import { clearCandidates } from '../Reducer/Actions/move'
-import { getCastlingDirections } from '../../Arbiter/GetMoves'
-import { useSocket } from '../Context/SocketContenxt'
-import {
-  updateCastling,
-  detectStalemate,
-  detectInsufficientMaterial,
-  detectCheckMate,
-} from '../Reducer/Actions/game'
+ 
 
 const Pieces = () => {
   const ref = useRef()
@@ -23,9 +15,9 @@ const Pieces = () => {
     
 
       const handleCastleUpdate = (direction) => {
-        console.log('castle direction', direction.action)
+        console.log('castle direction', direction)
 
-        if (direction) dispatch(updateCastling(direction))
+        if (direction) dispatch(direction)
       }
 
       const openPromotionBox = (promotionInfo) => {
