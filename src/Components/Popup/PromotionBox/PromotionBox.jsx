@@ -1,10 +1,7 @@
 import './PromotionBox.css'; 
 import { useAppContext } from '../../Context/Context.jsx';
 import { copyPosition } from '../../Board/helper.jsx';
-import { clearCandidates } from '../../Reducer/Actions/move.jsx';
-import { makeNewMove } from '../../Reducer/Actions/move.jsx';
-import { useSocket } from '../../Context/SocketContenxt.jsx';
-import { useRef } from 'react';
+
 const PromotionBox = ({onClosePopup}) =>{
     const options = ['q','r','b','n']; 
      
