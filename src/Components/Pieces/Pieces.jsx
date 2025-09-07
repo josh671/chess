@@ -1,26 +1,46 @@
 import './Pieces.css'
+import { useEffect } from 'react'
 import Piece from './Piece'
 import { useRef } from 'react'
 import { useAppContext } from '../Context/Context'
-import { openPromotion } from '../Reducer/Actions/popup'
 import { clearCandidates } from '../Reducer/Actions/move'
-import { getCastlingDirections } from '../../Arbiter/GetMoves'
-import { useSocket } from '../Context/SocketContenxt'
-import {
-  updateCastling,
-  detectStalemate,
-  detectInsufficientMaterial,
-  detectCheckMate,
-} from '../Reducer/Actions/game'
+ 
 
 const Pieces = () => {
   const ref = useRef()
   const { appState, dispatch, socket, playerColor, roomId } = useAppContext()
   const currentPosition = appState.position[appState.position.length - 1]
-  // console.log('pieces playerColor', playerColor)
-  // console.log('pieces roomId', roomId)
-  // console.log(socket)
-  // console.log('pieces appState', appState)
+
+  useEffect(() =>{
+    
+
+      const handleCastleUpdate = (direction) => {
+        console.log('castle direction', direction)
+
+        if (direction) dispatch(direction)
+      }
+
+      const openPromotionBox = (promotionInfo) => {
+        console.log('Promotion info', promotionInfo)
+        if (!promotionInfo) return
+
+        dispatch(promotionInfo.action)
+        return;
+      }
+
+      const isCheckmateHandler = (isCheckmate) =>{
+        // dispatch(detectCheckMate(isCheckmate[0]))
+        console.log('isCheckmateHandler', isCheckmate); 
+        dispatch(isCheckmate); 
+        
+      }
+
+
+      socket.on('castlingUpdate', handleCastleUpdate)
+      socket.on('openPromotionBox', openPromotionBox)
+      socket.on('isCheckMate', isCheckmateHandler); 
+
+  },[socket, dispatch])
 
   const calculateCoordinates = (e) => {
     const { width, left, top } = ref.current.getBoundingClientRect()
@@ -46,28 +66,7 @@ const Pieces = () => {
 
 
 
-
-
-      const handleCastleUpdate = (direction) => {
-        console.log('castle direction', direction.action)
-
-        if (direction) dispatch(updateCastling(direction))
-      }
-
-      const openPromotionBox = (promotionInfo) => {
-        console.log('Promotion info', promotionInfo)
-        if (!promotionInfo) return
-
-        dispatch(promotionInfo.action)
-        return;
-      }
-
-      const isCheckmateHandler = (isCheckmate) =>{
-        // dispatch(detectCheckMate(isCheckmate[0]))
-        console.log('isCheckmateHandler', isCheckmate); 
-        dispatch(isCheckmate); 
-        
-      }
+ 
 
       console.log(appState)
       if (!socket) return
@@ -99,9 +98,7 @@ const Pieces = () => {
         opponent
       })
 
-      socket.on('castlingUpdate', handleCastleUpdate)
-      socket.on('openPromotionBox', openPromotionBox)
-      socket.on('isCheckMate', isCheckmateHandler); 
+      
     }
     console.log('new appState', appState)
     dispatch(clearCandidates())

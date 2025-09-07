@@ -6,7 +6,6 @@ import { makeNewMove } from '../../Reducer/Actions/move.jsx';
 import { useSocket } from '../../Context/SocketContenxt.jsx';
 import { useRef } from 'react';
 const PromotionBox = ({onClosePopup}) =>{
-    const ref = useRef() 
     const options = ['q','r','b','n']; 
      
     const { appState , dispatch, socket, roomId, rank, file, x, y } = useAppContext()
@@ -17,12 +16,7 @@ const PromotionBox = ({onClosePopup}) =>{
         return null; 
     }
         
-        
-        
    const color = promotionSquare.x=== 7 ? 'w' : 'b';
-    
-
- 
         
     const getPromotionBoxPosition = () =>{
         const style = {}; 
@@ -47,8 +41,6 @@ const PromotionBox = ({onClosePopup}) =>{
         onClosePopup(); 
          const newPosition = copyPosition(appState.position[appState.position.length - 1]); 
         
-        //  newPosition[promotionSquare.rank][promotionSquare.file] = ''; 
-        //  newPosition[promotionSquare.x][promotionSquare.y] = color + option; 
         
        console.log('popup Socket',   roomId, 
             newPosition, 
