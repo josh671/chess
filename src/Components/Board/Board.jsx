@@ -5,10 +5,9 @@ import Pieces from '../Pieces/Pieces.jsx'
 import { useAppContext } from '../Context/Context.jsx'
 import Popup from '../Popup/Popup.jsx'
 import PromotionBox from '../Popup/PromotionBox/PromotionBox.jsx'
-import { arbiter } from '../../Arbiter/Arbiter.jsx'
-import { getKingPosition } from '../../Arbiter/GetMoves.jsx'
 import GameEnds from '../Popup/GameEnds/GameEnds.jsx'
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
+import { DEFAULT_BOARD_COORDINATES } from '../../Constants.js'
 
 
 const Board = () => {
@@ -16,44 +15,56 @@ const Board = () => {
   const { appState, dispatch, socket, playerColor, roomId} = useAppContext()
   const position = appState.position[appState.position.length - 1]
 
-  const ranks = Array(8)
-    .fill()
-    .map((x, i) => 8 - i)
-  const files = Array(8)
-    .fill()
-    .map((x, i) => i + 1)
-//  WORKING BUT NEED TO FIX WRONG CHECKMATE WINNER 
+  // Use coordinates from server, fallback to default constants if not available
+  const ranks = appState.boardCoordinates?.ranks || DEFAULT_BOARD_COORDINATES.ranks
+  const files = appState.boardCoordinates?.files || DEFAULT_BOARD_COORDINATES.files
 
+
+
+  // Memoize the move result handler to prevent unnecessary re-renders
+  const handleMoveResult = useCallback(({ newPosition, turn }) => {
+    dispatch({ type: 'NEW_MOVE', payload: { newPosition, turn } });
+    console.log('New position received from server:', newPosition, turn);
+  }, [dispatch]);
+
+  // Handle check status updates from server
+  const handleCheckStatus = useCallback((checkStatus) => {
+    dispatch({ type: 'UPDATE_CHECK_STATUS', payload: checkStatus });
+    console.log('Check status received from server:', checkStatus);
+  }, [dispatch]);
 
   useEffect(() => {
-    if (!socket) return
+    if (!socket) return;
+
+    socket.on('moveResult', handleMoveResult);
+    socket.on('checkStatus', handleCheckStatus);
     
+    return () => {
+      socket.off('moveResult', handleMoveResult);
+      socket.off('checkStatus', handleCheckStatus);
+    };
+  }, [socket, handleMoveResult, handleCheckStatus]);
 
-    const handleMoveResult = ({ newPosition, turn }) => {
-      // Dispatch your action to update app state
-      dispatch({ type: 'NEW_MOVE', payload: { newPosition, turn } }) 
-
-      console.log('New position received from server:', newPosition, turn)
+  // Get check status from server-provided data - highlight any king in check
+  const getCheckedKingPositions = () => {
+    if (!appState.checkStatus) return [];
+    
+    const checkedPositions = [];
+    
+    // Check if white king is in check
+    if (appState.checkStatus.white?.isInCheck) {
+      checkedPositions.push(appState.checkStatus.white.kingPosition);
     }
-     
-      socket.on('moveResult', handleMoveResult)
-      return () => socket.off('moveResult', handleMoveResult); 
-
-  }, [socket, dispatch])
-
-
-  //Need to emit this to back end 
-  const isChecked = (() => {
-    const isInCheck = arbiter.isPlayerInCheck({
-      positionAfterMove: position,
-      player: appState.turn,
-    })
-    console.log('isInCheck', isInCheck)
-    if (isInCheck) {
-      return getKingPosition(position, appState.turn)
+    
+    // Check if black king is in check
+    if (appState.checkStatus.black?.isInCheck) {
+      checkedPositions.push(appState.checkStatus.black.kingPosition);
     }
-    return null
-  })()
+    
+    return checkedPositions;
+  }
+  
+  const checkedKingPositions = getCheckedKingPositions();
 
   const getClassName = (i, j) => {
     let c = 'tile'
@@ -62,9 +73,12 @@ const Board = () => {
     if (appState.candidateMoves?.find((m) => m[0] === i && m[1] === j)) {
       c += position[i][j] ? ' attacking' : ' highlight'
     }
-    if (isChecked && isChecked[0] === i && isChecked[1] === j) {
+    
+    // Check if this position contains a king in check
+    if (checkedKingPositions.some(pos => pos && pos[0] === i && pos[1] === j)) {
       c += ' checked'
     }
+    
     return c
   }
 console.log('board appstate', appState)

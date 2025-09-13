@@ -7,6 +7,7 @@ const actionTypes = {
     "NEW_MOVE" : "NEW_MOVE",
     "PROMOTION_CLOSE" : "PROMOTION_CLOSE",
     "PROMOTION_OPEN" : "PROMOTION_OPEN",
+    "SET_PROMOTION_STATUS" : "SET_PROMOTION_STATUS", // Track promotion status for all players
     "INSUFFICIENT_MATERIAL" : "INSUFFICIENT_MATERIAL",
     "WIN" : "WIN",
 
