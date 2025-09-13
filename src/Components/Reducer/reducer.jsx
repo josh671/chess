@@ -1,107 +1,119 @@
 import actionTypes from "./Actions/actionTypes"
 import { Status } from "../../Constants"
-export const reducer = (state, action)=>{
+
+export const reducer = (state, action) => {
     console.log('Reducer action:', action);
     console.log('Reducer state:', state);
+    
     switch (action.type) {
-        case actionTypes.NEW_MOVE : {
-            let {position, turn} = state 
-            position = [
-                ...position,
-                action.payload.newPosition
-            ]
-            
-            turn = action.payload.turn
-
-            return {
-                ...state,
-                position,
-              
-                turn,
-            }
-        }
-
-        case actionTypes.GENERATE_CANDIDATE_MOVES : {
+        // ========================================
+        // UI STATE MANAGEMENT (Frontend Only)
+        // ========================================
+        
+        case actionTypes.GENERATE_CANDIDATE_MOVES: {
             return {
                 ...state, 
-                candidateMoves : action.payload.candidateMoves
+                candidateMoves: action.payload.candidateMoves
             }
         }
 
-        case actionTypes.CLEAR_CANDIDATE_MOVES : {
+        case actionTypes.CLEAR_CANDIDATE_MOVES: {
             return {
                 ...state, 
-                candidateMoves : []
+                candidateMoves: []
             }
         }
-        case actionTypes.PROMOTION_OPEN : {
+
+        case actionTypes.PROMOTION_OPEN: {
             return {
                 ...state, 
                 status: Status.promoting, 
-                promotionSquare : {...action.payload} 
+                promotionSquare: {...action.payload} 
             }
         }
 
-        case actionTypes.PROMOTION_CLOSE : {
-            let {turn} = state 
-            turn = turn === 'w' ? 'b' : 'w'
+        case actionTypes.PROMOTION_CLOSE: {
             return {
                 ...state, 
-                status : Status.ongoing,
-                promotionSquare : null, 
-                turn, 
-                
+                status: Status.ongoing,
+                promotionSquare: null,
+                isPromoting: false,
+                promotingPlayer: null
             }
         }
 
-        case actionTypes.SWITCH_TURN : {
+        case 'SET_PROMOTION_STATUS': {
             return {
-                ...state, 
-                turn : state.turn === 'w' ? 'b' : 'w'
+                ...state,
+                isPromoting: action.payload.isPromoting,
+                promotingPlayer: action.payload.promotingPlayer
             }
         }
 
-    
-    case actionTypes.CAN_CASTLE : {
-        let {turn,castleDirection} = state 
-    
-        castleDirection[turn] = action.payload
+        // ========================================
+        // SERVER DATA UPDATES (Receiving from Backend)
+        // ========================================
         
-        return {
-            ...state,
-            castleDirection,
-            
+        case actionTypes.NEW_MOVE: {
+            return {
+                ...state,
+                position: [
+                    ...state.position,
+                    action.payload.newPosition
+                ],
+                turn: action.payload.turn
+            }
         }
-    }
 
-    case actionTypes.STALEMATE : {
-        return {
-            ...state, 
-            status : Status.stalemate
+        case actionTypes.NEW_GAME: {
+            return {
+                ...action.payload
+            }
         }
-    }
 
-    case actionTypes.NEW_GAME : {
-        return {
-            ...action.payload
+        case 'UPDATE_CHECK_STATUS': {
+            return {
+                ...state,
+                checkStatus: action.payload
+            }
         }
-    }
 
-    case actionTypes.INSUFFICIENT_MATERIAL : {
-        return {
-            ...state, 
-            status : Status.insufficient
+        // ========================================
+        // BACKEND-DETERMINED GAME STATUS (Receiving Only)
+        // ========================================
+        
+        case actionTypes.CAN_CASTLE: {
+            return {
+                ...state,
+                castleDirection: {
+                    ...state.castleDirection,
+                    [action.payload.player]: action.payload.direction
+                }
+            }
         }
-    }   
 
-    case actionTypes.WIN : {
-        return {
-            ...state, 
-            status : action.payload === 'w' ? Status.white : Status.black
+        case actionTypes.STALEMATE: {
+            return {
+                ...state, 
+                status: Status.stalemate
+            }
         }
-    }   
 
-    default : 
-        return state
+        case actionTypes.INSUFFICIENT_MATERIAL: {
+            return {
+                ...state, 
+                status: Status.insufficient
+            }
+        }   
+
+        case actionTypes.WIN: {
+            return {
+                ...state, 
+                status: action.payload === 'w' ? Status.white : Status.black
+            }
+        }
+
+        default: 
+            return state
     }
 }

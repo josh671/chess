@@ -3,7 +3,7 @@ import { Status } from '../../../Constants.js'
 import { useAppContext } from '../../Context/Context.jsx'
 import { setupNewGame } from '../../Reducer/Actions/game.jsx'
 import { closePopup } from '../../Reducer/Actions/popup.jsx' 
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 const GameEnds = ({ onClosePopup }) => {
     const {
     appState: { status },
@@ -12,14 +12,21 @@ const GameEnds = ({ onClosePopup }) => {
     roomId,
   } = useAppContext()
 
-  useEffect(() =>{
-     const newGameSetup = (newGame) => {
-      console.log('New game state received from server in GameEnds:', newGame)
-      dispatch(setupNewGame(newGame.payload))
-    }
+  // Memoize the new game setup handler
+  const newGameSetup = useCallback((newGame) => {
+    console.log('New game state received from server in GameEnds:', newGame);
+    dispatch(setupNewGame(newGame.payload));
+  }, [dispatch]);
 
-    socket.on('newGame', newGameSetup)
-  },[socket, dispatch])
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('newGame', newGameSetup);
+    
+    return () => {
+      socket.off('newGame', newGameSetup);
+    };
+  }, [socket, newGameSetup]);
   
 
   if (status === Status.ongoing || status === Status.promoting) return null

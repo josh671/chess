@@ -11,6 +11,13 @@
     height: 12.5%;
     background-size: 100%;
     position: absolute;
+    transition: opacity 0.2s ease;
+}
+
+.piece--disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    filter: grayscale(0.3);
 }
 
 /* set images for black pieces */

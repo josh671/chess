@@ -4,7 +4,7 @@ import { reducer } from './Components/Reducer/reducer'
 import { useReducer } from 'react'
 import {initGameState} from './Constants'; 
 import {  useSocket } from './Components/Context/SocketContenxt';
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 function App() {
 
   const [appState, dispatch ] = useReducer(reducer, initGameState)
@@ -25,34 +25,46 @@ function App() {
     console.log('joined room', roomId);
   }
   
-  //Set Player Color 
-  const handlePlayerColor = ({color})=>{
+  // Set Player Color - memoized to prevent useEffect re-runs
+  const handlePlayerColor = useCallback(({color}) => {
     console.log('app playerColor', color);
-
-
-
     setPlayerColor(color); 
     setJoined(true); 
-  }
+  }, []);
 
-  useEffect(() =>{
-    console.log('socket', socket);
-    if(!socket) return; 
+  const handleBoardSetup = useCallback((newBoard) => {
+    console.log(newBoard); 
+    dispatch(newBoard);
+  }, [dispatch]);
 
+  const handlePromotionStatus = useCallback((statusUpdate) => {
+    console.log('Promotion status update:', statusUpdate);
+    dispatch(statusUpdate);
+  }, [dispatch]);
+  useEffect(() => {
+    if (!socket) return; 
 
-    socket.on('playerColor', handlePlayerColor)
-    console.log('color', playerColor);
-
-    socket.on('roomFull', () => {
-      alert('room is full!'); 
+    const handleRoomFull = () => {
+      alert('Room is full!'); 
       setJoined(false); 
-    })
-   return () => {
-    socket.off('playerColor', handlePlayerColor);
-    socket.off('roomFull');
-  };
+    };
 
-  },[socket])
+    // Add event listeners
+    socket.on('board', handleBoardSetup);
+    socket.on('playerColor', handlePlayerColor);
+    socket.on('roomFull', handleRoomFull);
+    socket.on('promotionStatus', handlePromotionStatus);
+    
+    console.log('Socket connected, current playerColor:', playerColor);
+
+    // Cleanup function
+    return () => {
+      socket.off('board', handleBoardSetup);
+      socket.off('playerColor', handlePlayerColor);
+      socket.off('roomFull', handleRoomFull);
+      socket.off('promotionStatus', handlePromotionStatus);
+    };
+  }, [socket, handleBoardSetup, handlePlayerColor, playerColor, handlePromotionStatus]);
 
  
   if (!joined) {
