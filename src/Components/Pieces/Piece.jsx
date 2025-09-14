@@ -41,11 +41,11 @@ const Piece = ({piece, rank, file}) =>{
             // Request valid moves from backend
             socket.emit('getValidMoves', {
                 position: currentPosition[currentPosition.length - 1],
-                castleDirection: castleDirection[turn], 
-                piece, 
-                rank, 
+                castleDirection: castleDirection[turn],
+                piece,
+                rank,
                 file
-            });  
+            });
         }
     }
 
