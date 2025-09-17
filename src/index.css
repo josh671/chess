@@ -10,7 +10,7 @@ html,body {
   display: grid;
   place-content: center;
   height: 100vh;
-  background: var(--bg-color);
+  background: #3A3A3A;
   font-family: 'Sofia Sans', sans-serif;
   grid-template-columns: auto 220px;
 

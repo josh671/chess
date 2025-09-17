@@ -1,3 +1,8 @@
+/**
+ * Chess Board Component
+ * Renders the main chess board with tiles, pieces, and handles move updates
+ */
+
 import './Board.css'
 import Ranks from './bits/Ranks.jsx'
 import Files from './bits/Files.jsx'
@@ -8,11 +13,15 @@ import PromotionBox from '../Popup/PromotionBox/PromotionBox.jsx'
 import GameEnds from '../Popup/GameEnds/GameEnds.jsx'
 import { useEffect, useCallback } from 'react'
 import { DEFAULT_BOARD_COORDINATES } from '../../Constants.js'
+import PastMoves from './PastMoves.jsx'
 
-
+/**
+ * Main Board component that renders the chess board and handles game updates
+ * @returns {JSX.Element} Chess board with tiles, pieces, and UI elements
+ */
 const Board = () => {
-   
-  const { appState, dispatch, socket, playerColor, roomId} = useAppContext()
+  // Get app context for game state and socket connection
+  const { appState, dispatch, socket, playerColor, roomId } = useAppContext()
   const position = appState.position[appState.position.length - 1]
 
   // Use coordinates from server, fallback to default constants if not available
@@ -21,68 +30,95 @@ const Board = () => {
 
 
 
-  // Memoize the move result handler to prevent unnecessary re-renders
+  /**
+   * Handle move result updates from server
+   * @param {Object} moveData - Move result data
+   * @param {Array} moveData.newPosition - New board position after move
+   * @param {string} moveData.turn - Whose turn it is next
+   * Memoized to prevent unnecessary re-renders
+   */
   const handleMoveResult = useCallback(({ newPosition, turn }) => {
     dispatch({ type: 'NEW_MOVE', payload: { newPosition, turn } });
     console.log('New position received from server:', newPosition, turn);
   }, [dispatch]);
 
-  // Handle check status updates from server
+  /**
+   * Handle check status updates from server
+   * @param {Object} checkStatus - Check status data for both players
+   * @param {Object} checkStatus.white - White player check status
+   * @param {Object} checkStatus.black - Black player check status
+   */
   const handleCheckStatus = useCallback((checkStatus) => {
     dispatch({ type: 'UPDATE_CHECK_STATUS', payload: checkStatus });
     console.log('Check status received from server:', checkStatus);
   }, [dispatch]);
 
+  /**
+   * Setup socket event listeners for game updates
+   */
   useEffect(() => {
     if (!socket) return;
 
+    // Listen for move results and check status updates
     socket.on('moveResult', handleMoveResult);
     socket.on('checkStatus', handleCheckStatus);
-    
+
+    // Cleanup listeners on component unmount
     return () => {
       socket.off('moveResult', handleMoveResult);
       socket.off('checkStatus', handleCheckStatus);
     };
   }, [socket, handleMoveResult, handleCheckStatus]);
 
-  // Get check status from server-provided data - highlight any king in check
+  /**
+   * Get positions of kings that are currently in check
+   * @returns {Array} Array of king positions that are in check [[rank, file], ...]
+   */
   const getCheckedKingPositions = () => {
     if (!appState.checkStatus) return [];
-    
+
     const checkedPositions = [];
-    
+
     // Check if white king is in check
     if (appState.checkStatus.white?.isInCheck) {
       checkedPositions.push(appState.checkStatus.white.kingPosition);
     }
-    
+
     // Check if black king is in check
     if (appState.checkStatus.black?.isInCheck) {
       checkedPositions.push(appState.checkStatus.black.kingPosition);
     }
-    
+
     return checkedPositions;
   }
   
   const checkedKingPositions = getCheckedKingPositions();
 
+  /**
+   * Generate CSS class names for board tiles
+   * @param {number} i - Rank index
+   * @param {number} j - File index
+   * @returns {string} CSS class names for the tile
+   */
   const getClassName = (i, j) => {
     let c = 'tile'
     c += (i + j) % 2 === 0 ? ' tile--dark' : ' tile--light'
 
+    // Highlight possible moves
     if (appState.candidateMoves?.find((m) => m[0] === i && m[1] === j)) {
       c += position[i][j] ? ' attacking' : ' highlight'
     }
-    
-    // Check if this position contains a king in check
+
+    // Highlight kings in check
     if (checkedKingPositions.some(pos => pos && pos[0] === i && pos[1] === j)) {
       c += ' checked'
     }
-    
+
     return c
   }
-console.log('board appstate', appState)
+ 
   return (
+    <>
     <div className="board">
       <Ranks ranks={ranks} />
       <div className="tiles">
@@ -104,6 +140,9 @@ console.log('board appstate', appState)
       </Popup>
       <Files files={files} />
     </div>
+    <PastMoves/>
+    </>
+    
   )
 }
 

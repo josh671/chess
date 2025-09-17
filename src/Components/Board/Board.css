@@ -56,4 +56,14 @@
     border-radius: 20%; 
     left: 0%; 
     top: 0%; 
+} 
+
+.pastMoves{
+    display: block; 
+    width: 100px; 
+    height: 100px; 
+    background-color: red;
+    float: left; 
+    
+
 }
