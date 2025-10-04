@@ -22,17 +22,21 @@ const PastMoves = () =>{
         }
     },[socket, pastMoveHandler])
 
+    const pastMovesStyleHandler = (index) =>{
+        return index % 2 === 0 ? 'current_displayed_move_light' : 'current_displayed_moave_dark'; 
+    }
 
-
-
-
+ 
+    console.log('pastMovesArray', pastMovesArray.length); 
     return(
         <>
-        <div className='pastMoves'>
+        <div className='pastMoves'> 
+        <div className='movesList'>
             {pastMovesArray.map((acc, index) => (
-                <p key={index}>{acc.currentMoveNotation}</p>
+                <p className={pastMovesStyleHandler(index) } key={index}>{acc.currentMoveNotation}</p>
             ))}
         </div>
+        </div> 
         </>
     )
 } 
