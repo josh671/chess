@@ -25,29 +25,36 @@ function App() {
   const [roomId, setRoomId] = useState('');      // Room ID for multiplayer games
   const [joined, setJoined] = useState(false);   // Whether player has joined a room
   const [playerColor, setPlayerColor] = useState(''); // Player's assigned color ('w' or 'b') 
-   
+  const [username, setUsername] = useState(''); //Set Players Username
+
 
   /**
    * Handle joining a multiplayer game room
    * Emits joinRoom event to server with the provided room ID
    */
   const joinRoom = () => {
-    if (socket && roomId) {
-      socket.emit('joinRoom', roomId);
+    if (socket && roomId && username) {
+      socket.emit('joinRoom', { roomId, username });
     }
-    console.log('joined room', roomId);
+    console.log('joined room', roomId, 'as ', username);
   }
-  
+
+
   /**
-   * Handle player color assignment from server
+   * Handle player color assignment from server with username and reconnection support
    * @param {Object} data - Color assignment data
    * @param {string} data.color - Assigned player color ('w' or 'b')
+   * @param {string} data.username - Player's username
+   * @param {boolean} data.isReconnecting - Whether this is a reconnection
    * Memoized to prevent useEffect re-runs
    */
-  const handlePlayerColor = useCallback(({ color }) => {
-    console.log('app playerColor', color);
+  const handlePlayerColor = useCallback(({ color, username: serverUsername, isReconnecting }) => {
+    console.log('app playerColor', color, 'username:', serverUsername, 'reconnecting:', isReconnecting);
     setPlayerColor(color);
     setJoined(true);
+    if (isReconnecting) {
+      alert(`Welcome back ${serverUsername}! Reconnecting as ${color === 'w' ? 'white' : 'black'}`)
+    }
   }, []);
 
   /**
@@ -82,11 +89,28 @@ function App() {
       setJoined(false);
     };
 
+    const handleJoinError = ({ message }) => {
+      alert(message);
+    }
+
+    const handlePlayerStatus = ({ white, black }) => {
+      console.log('Player status: ', { white, black })
+      //Display in UI if needed
+    }
+
+    const handlePlayerDisconnected = ({ username, color }) => {
+      console.log(`Player ${username} (${color}) disconnected`)
+    }
+
     // Add socket event listeners
     socket.on('board', handleBoardSetup);
     socket.on('playerColor', handlePlayerColor);
     socket.on('roomFull', handleRoomFull);
+    socket.on('joinError', handleJoinError)
+    socket.on('playerStatus', handlePlayerStatus)
+    socket.on('playerDisconnected', handlePlayerDisconnected)
     socket.on('promotionStatus', handlePromotionStatus);
+
 
     console.log('Socket connected, current playerColor:', playerColor);
 
@@ -95,6 +119,9 @@ function App() {
       socket.off('board', handleBoardSetup);
       socket.off('playerColor', handlePlayerColor);
       socket.off('roomFull', handleRoomFull);
+      socket.off('playerStatus', handlePlayerStatus)
+      socket.off('playerDisconnected', handlePlayerDisconnected)
+      socket.off('promotionStatus', handlePromotionStatus);
       socket.off('promotionStatus', handlePromotionStatus);
     };
   }, [socket, handleBoardSetup, handlePlayerColor, playerColor, handlePromotionStatus]);
@@ -103,24 +130,31 @@ function App() {
   if (!joined) {
     return (
       <div className="App">
-        <input
-          value={roomId}
-          onChange={e => setRoomId(e.target.value)}
-          placeholder="Enter room code"
-        />
-        <button onClick={joinRoom}>Join Game</button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px', margin: '50px auto' }}>
+          <input
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            placeholder="Enter Username"
+          />
+          <input
+            value={roomId}
+            onChange={e => setRoomId(e.target.value)}
+            placeholder="Enter room code"
+          />
+          <button onClick={joinRoom}>Join Game</button>
+        </div>
       </div>
     )
   }
 
   // Render main game board with context providers
   return (
-    <AppContext.Provider value={{ appState, dispatch, socket, playerColor, roomId }}>
+    <AppContext.Provider value={{ appState, dispatch, socket, playerColor, roomId, username }}>
       <div className="App">
         <Board />
-        
+
       </div>
-      
+
     </AppContext.Provider>
   )
 }
